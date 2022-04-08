@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class TileManager : MonoBehaviour
 {
     private static TileManager instance;
@@ -10,6 +10,10 @@ public class TileManager : MonoBehaviour
     public MatrixGenerator matrix;
     public Tile SelectTile;
     public int Index =0;
+    public int turn = 0;
+
+    public Button StartOverButton;
+    public AudioSource AudioSource;
     public List<Tile> SelectedTiles = new List<Tile>();
     private void Awake()
     {
@@ -25,6 +29,8 @@ public class TileManager : MonoBehaviour
     void Start()
     {
         matrix = GetComponent<MatrixGenerator>();
+        AudioSource = GetComponent<AudioSource>();
+        StartOverButton.onClick.AddListener(StartOver);
     }
 
     // Update is called once per frame
@@ -39,22 +45,30 @@ public class TileManager : MonoBehaviour
         SelectTile = tile;
         if (CheckForTiles())
         {
+            if(!AudioSource.isPlaying)
+            AudioSource.Play();
             tile.Selected.enabled = true;
             tile.Highlighted.enabled = false;
-            for (int i = 0; i < matrix.NumberOfRows; i++)
-			{
-                if (i != (int)tile.indecies.x)
-                {
-                    if (!matrix.tiles[i, (int)tile.indecies.y].Selected.isActiveAndEnabled)
-                    matrix.tiles[i, (int)tile.indecies.y].Highlighted.enabled = true;
-                }
-			}
-            for (int i = 0; i < matrix.NumberOfColumns ; i++)
+            if (Index % 2 == 1)
             {
-                if (i != (int)tile.indecies.y)
+                for (int i = 0; i < matrix.NumberOfRows; i++)
                 {
-                    if (!matrix.tiles[(int)tile.indecies.x, i].Selected.isActiveAndEnabled)
-                        matrix.tiles[(int)tile.indecies.x, i].Highlighted.enabled = true;
+                    if (i != (int)tile.indecies.x)
+                    {
+                        if (!matrix.tiles[i, (int)tile.indecies.y].Selected.isActiveAndEnabled)
+                            matrix.tiles[i, (int)tile.indecies.y].Highlighted.enabled = true;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < matrix.NumberOfColumns; i++)
+                {
+                    if (i != (int)tile.indecies.y)
+                    {
+                        if (!matrix.tiles[(int)tile.indecies.x, i].Selected.isActiveAndEnabled)
+                            matrix.tiles[(int)tile.indecies.x, i].Highlighted.enabled = true;
+                    }
                 }
             }
         }
@@ -65,10 +79,67 @@ public class TileManager : MonoBehaviour
 	{
         if(SelectTile.code == matrix.seq[Index] )
 		{
-            SelectedTiles.Add(SelectTile);
-            Index++;
-            return true;
-		}
+           
+            if (SelectedTiles.Count > 0)
+            {
+                if (Index % 2 == 1 && SelectedTiles[SelectedTiles.Count - 1].indecies.y == SelectTile.indecies.y)
+                {
+                    SelectedTiles.Add(SelectTile);
+                    Index++;
+                    ClearHighlightedTiles();
+                    return true;
+                }
+                if (Index % 2 == 0 && SelectedTiles[SelectedTiles.Count - 1].indecies.x == SelectTile.indecies.x)
+                {
+                    SelectedTiles.Add(SelectTile);
+                    Index++;
+                    ClearHighlightedTiles();
+                    return true;
+                }
+            }
+            else
+			{
+                SelectedTiles.Add(SelectTile);
+                Index++;
+                return true;
+            }
+        }
         return false;
+	}
+
+    public void ClearHighlightedTiles()
+	{
+        for (int i = 0; i < matrix.NumberOfRows; i++)
+        {
+            for (int j = 0; j < matrix.NumberOfColumns; j++)
+            {
+
+                matrix.tiles[i, j].Highlighted.enabled = false;
+
+            }
+
+        }
+    }
+
+    public void ClearSelectedTiles()
+    {
+        for (int i = 0; i < matrix.NumberOfRows; i++)
+        {
+            for (int j = 0; j < matrix.NumberOfColumns; j++)
+            {
+
+                matrix.tiles[i, j].Selected.enabled = false;
+
+            }
+
+        }
+    }
+
+    public void StartOver()
+	{
+        SelectedTiles.Clear();
+        Index = 0;
+        ClearHighlightedTiles();
+        ClearSelectedTiles();
 	}
 }
