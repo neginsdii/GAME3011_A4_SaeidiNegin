@@ -128,12 +128,15 @@ public class TileManager : MonoBehaviour
                 return true;
             }
         }
-        else if (!GameEnded)
+        else 
         {
-            textMessage.text = "You lost 5 seconds";
-            timer.DeductTime(5);
+            if (!GameEnded)
+            {
+                textMessage.text = "You lost 5 seconds";
+                timer.DeductTime(5);
 
-            StartCoroutine(clearTextMessage());
+                StartCoroutine(clearTextMessage());
+            }
         }
         return false;
 	}
@@ -204,7 +207,7 @@ public class TileManager : MonoBehaviour
 	{
         if(Index==matrix.lengthOfSequence)
 		{
-            textMessage.text = "You hakced the system";
+            textMessage.text = "You hacked the system";
             GameEnded = true;
             Data.skillLevel++;
             if (Data.skillLevel >= 2)
