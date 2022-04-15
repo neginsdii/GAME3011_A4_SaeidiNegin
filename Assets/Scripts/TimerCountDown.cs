@@ -7,18 +7,22 @@ public class TimerCountDown : MonoBehaviour
 	public TextMeshProUGUI textDisplay;
 	public float gameTime;
 	public float level2GameTime;
-	private float timer;
+	public float timer;
 	private bool stopTimer;
 
-
+	private AudioSource audioSource;
+	public AudioSource timeOut;
 	private void Start()
 	{
+		InitializeGame();
 		stopTimer = false;
 		timer = gameTime;
+		audioSource = GetComponent<AudioSource>();
 	}
 
 	private void Update()
 	{
+		if(!TileManager.Instance.GameEnded)
 		UpdateTimer();
 	}
 
@@ -31,6 +35,10 @@ public class TimerCountDown : MonoBehaviour
 		if (timer <= 0)
 		{
 			stopTimer = true;
+			if (!timeOut.isPlaying)
+				timeOut.Play();
+			TileManager.Instance.GameEnded = true;
+
 			timer = 0;
 		}
 		if (!stopTimer)
@@ -38,5 +46,27 @@ public class TimerCountDown : MonoBehaviour
 			textDisplay.SetText(textTime);
 		}
 	}
-	
+	public void DeductTime(float sec)
+	{
+		timer -= sec;
+		if (!audioSource.isPlaying)
+			audioSource.Play();
+	}
+
+	public void InitializeGame()
+	{
+		switch (Data.skillLevel)
+		{
+			case 0:
+				gameTime = 35;
+				break;
+			case 1:
+				gameTime = 55;
+				break;
+			case 2:
+				gameTime = 75;
+				break;
+
+		}
+	}
 }

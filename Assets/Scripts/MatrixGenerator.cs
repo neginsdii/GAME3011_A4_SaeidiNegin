@@ -18,7 +18,7 @@ public class MatrixGenerator : MonoBehaviour
     [SerializeField]
     private GameObject MatrixPanel;
     public TextMeshProUGUI sequenceText;
-
+    public TextMeshProUGUI SkillLevel;
 
     public string[] Codes;
     System.Random random = new System.Random();
@@ -27,7 +27,7 @@ public class MatrixGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        InitializeGame();
         tiles = new Tile[NumberOfRows, NumberOfColumns];
         GenerateMatrix();
         CreateSequence();
@@ -96,5 +96,43 @@ public class MatrixGenerator : MonoBehaviour
 		{
             sequenceText.text += seq[i] + " ";
 		}
+    }
+
+    public void InitializeGame()
+	{
+        switch(Data.skillLevel)
+		{
+            case 0:
+                SkillLevel.text = "Skill Level : Novice";
+                break;
+            case 1:
+                SkillLevel.text = "Skill Level : Advanced";
+                break;
+            case 2:
+                SkillLevel.text = "Skill Level : Master";
+                break;
+
+		}
+
+        switch (Data.LevelOfDifficulty)
+		{
+            case 0:
+                NumberOfRows = NumberOfColumns = 6;
+                lengthOfSequence = 4;
+               offset = new Vector2(425, -300);
+                break;
+            case 1:
+                NumberOfRows = NumberOfColumns = 9;
+                lengthOfSequence = 6;
+                offset = new Vector2(250, -100);
+
+                break;
+            case 2:
+                NumberOfRows = NumberOfColumns = 11;
+                lengthOfSequence = 8;
+                 offset = new Vector2(100, -100);
+                break;
+
+        }
     }
 }
